@@ -52,6 +52,13 @@ export default function ControlScreen() {
     []
   );
 
+  const handleWheelChange = useCallback(
+    (angle: number, pedalStatus: string) => {
+      setWheelData({ angle, pedalStatus });
+    },
+    []
+  );
+
   const renderControl = () => {
     switch (selectedJoystick) {
       case "analogico":
@@ -62,10 +69,10 @@ export default function ControlScreen() {
         return (
           <SteeringWheel
             onAngleChange={(angle) =>
-              setWheelData((prev) => ({ ...prev, angle }))
+              handleWheelChange(angle, wheelData.pedalStatus)
             }
             onPedalChange={(pedalStatus) =>
-              setWheelData((prev) => ({ ...prev, pedalStatus }))
+              handleWheelChange(wheelData.angle, pedalStatus)
             }
           />
         );

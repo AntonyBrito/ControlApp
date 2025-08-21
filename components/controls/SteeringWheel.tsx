@@ -31,11 +31,8 @@ export default function SteeringWheel({
 
       let angle = (Math.atan2(dy, dx) * 180) / Math.PI;
 
-      if (angle > 180) angle -= 360;
-      if (angle < -180) angle += 360;
-
-      if (angle > 180) angle = 180;
-      if (angle < -180) angle = -180;
+      // Limitar o ângulo
+      angle = Math.max(-180, Math.min(180, angle));
 
       rotation.value = angle;
       runOnJS(onAngleChange)(Math.round(angle));
