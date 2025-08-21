@@ -1,7 +1,7 @@
 import AnalogJoystick from "@/components/controls/AnalogJoystick";
 import Dpad from "@/components/controls/DirectionalPad";
 import SteeringWheel from "@/components/controls/SteeringWheel";
-import React, { useCallback, useState } from "react";
+import { useCallback, useState } from "react";
 import {
   Dimensions,
   StyleSheet,

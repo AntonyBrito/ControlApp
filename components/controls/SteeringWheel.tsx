@@ -1,17 +1,12 @@
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
-import {
-  Dimensions,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import {
   GestureHandlerRootView,
   PanGestureHandler,
 } from "react-native-gesture-handler";
 import Animated, {
   runOnJS,
+  useAnimatedGestureHandler,
   useAnimatedStyle,
   useSharedValue,
   withSpring,
@@ -28,27 +23,28 @@ export default function SteeringWheel({
 }: SteeringWheelProps) {
   const rotation = useSharedValue(0);
 
-  const handleGesture = (event: any) => {
-    // Centro do volante
-    const centerX = Dimensions.get("window").width / 2;
-    const centerY = 200; // ajuste conforme layout
+  // Gesture handler correto
+  const gestureHandler = useAnimatedGestureHandler({
+    onActive: (event) => {
+      const dx = event.translationX;
+      const dy = event.translationY;
 
-    // Calcula ângulo em relação ao centro
-    const dx = event.absoluteX - centerX;
-    const dy = event.absoluteY - centerY;
-    let angle = (Math.atan2(dy, dx) * 180) / Math.PI;
+      let angle = (Math.atan2(dy, dx) * 180) / Math.PI;
 
-    // Ajusta para faixa -180 a +180
-    if (angle > 180) angle -= 360;
-    if (angle < -180) angle += 360;
+      if (angle > 180) angle -= 360;
+      if (angle < -180) angle += 360;
 
-    // Limite de giro
-    if (angle > 180) angle = 180;
-    if (angle < -180) angle = -180;
+      if (angle > 180) angle = 180;
+      if (angle < -180) angle = -180;
 
-    rotation.value = angle;
-    runOnJS(onAngleChange)(angle);
-  };
+      rotation.value = angle;
+      runOnJS(onAngleChange)(Math.round(angle));
+    },
+    onEnd: () => {
+      rotation.value = withSpring(0);
+      runOnJS(onAngleChange)(0);
+    },
+  });
 
   const animatedStyle = useAnimatedStyle(() => {
     return {
@@ -58,13 +54,7 @@ export default function SteeringWheel({
 
   return (
     <GestureHandlerRootView>
-      <PanGestureHandler
-        onGestureEvent={handleGesture}
-        onEnded={() => {
-          rotation.value = withSpring(0);
-          runOnJS(onAngleChange)(0);
-        }}
-      >
+      <PanGestureHandler onGestureEvent={gestureHandler}>
         <Animated.View style={[styles.wheelContainer, animatedStyle]}>
           <FontAwesome5 name="circle-notch" size={150} color="#61a3f2" />
         </Animated.View>
