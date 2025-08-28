@@ -1,6 +1,7 @@
 import AnalogJoystick from "@/components/controls/AnalogJoystick";
 import Dpad from "@/components/controls/DirectionalPad";
 import SteeringWheel from "@/components/controls/SteeringWheel";
+import SteeringWheelGyroscope from "@/components/controls/SteeringWheelGyroscope";
 import { useCallback, useState } from "react";
 import {
   Dimensions,
@@ -10,11 +11,14 @@ import {
   View,
 } from "react-native";
 
-type JoystickType = "analogico" | "setas" | "volante";
+// Tipos de controles
+type JoystickType = "analogico" | "setas" | "volante" | "gyro";
 
 export default function ControlScreen() {
   const [selectedJoystick, setSelectedJoystick] =
     useState<JoystickType>("analogico");
+
+  // Estados separados para cada controle
   const [joystickData, setJoystickData] = useState({
     x: 0,
     y: 0,
@@ -27,6 +31,7 @@ export default function ControlScreen() {
     pedalStatus: "PARADO",
   });
 
+  // Joystick analógico
   const handleJoystickMove = useCallback(
     ({ x, y }: { x: number; y: number }) => {
       const MAX_RAW_DISTANCE = 100;
@@ -51,12 +56,14 @@ export default function ControlScreen() {
     []
   );
 
-  const handleWheelChange = useCallback(
-    (angle: number, pedalStatus: string) => {
-      setWheelData({ angle, pedalStatus });
-    },
-    []
-  );
+  // Volante (manual ou giroscópio) - atualiza ângulo e pedal separadamente
+  const handleWheelAngleChange = useCallback((angle: number) => {
+    setWheelData((prev) => ({ ...prev, angle }));
+  }, []);
+
+  const handlePedalChange = useCallback((pedalStatus: string) => {
+    setWheelData((prev) => ({ ...prev, pedalStatus }));
+  }, []);
 
   const renderControl = () => {
     switch (selectedJoystick) {
@@ -67,12 +74,15 @@ export default function ControlScreen() {
       case "volante":
         return (
           <SteeringWheel
-            onAngleChange={(angle) =>
-              handleWheelChange(angle, wheelData.pedalStatus)
-            }
-            onPedalChange={(pedalStatus) =>
-              handleWheelChange(wheelData.angle, pedalStatus)
-            }
+            onAngleChange={handleWheelAngleChange}
+            onPedalChange={handlePedalChange}
+          />
+        );
+      case "gyro":
+        return (
+          <SteeringWheelGyroscope
+            onAngleChange={handleWheelAngleChange}
+            onPedalChange={handlePedalChange}
           />
         );
       default:
@@ -109,6 +119,7 @@ export default function ControlScreen() {
           </View>
         );
       case "volante":
+      case "gyro":
         return (
           <>
             <View style={styles.dataRow}>
@@ -130,7 +141,6 @@ export default function ControlScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Container de Botões */}
       <View style={styles.controlButtonsContainer}>
         <TouchableOpacity
           style={[
@@ -159,8 +169,18 @@ export default function ControlScreen() {
         >
           <Text style={styles.controlButtonText}>Volante</Text>
         </TouchableOpacity>
+        <TouchableOpacity
+          style={[
+            styles.controlButton,
+            selectedJoystick === "gyro" && styles.activeButton,
+          ]}
+          onPress={() => setSelectedJoystick("gyro")}
+        >
+          <Text style={styles.controlButtonText}>Volante Gyro</Text>
+        </TouchableOpacity>
       </View>
 
+      <Text style={styles.title}>Painel de Controlo</Text>
       <View style={styles.joystickContainer}>{renderControl()}</View>
       <View style={styles.dataBox}>{renderDataBox()}</View>
     </View>
@@ -175,21 +195,21 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "#0A192F",
-    paddingTop: height * 0.1,
+    paddingTop: height * 0.05,
     gap: 20,
   },
   controlButtonsContainer: {
     flexDirection: "row",
     justifyContent: "space-around",
-    width: "80%",
+    width: "90%",
     position: "absolute",
-    top: height * 0.1,
+    top: height * 0.05,
     zIndex: 1,
   },
   controlButton: {
     backgroundColor: "#333642",
     paddingVertical: 10,
-    paddingHorizontal: 20,
+    paddingHorizontal: 15,
     borderRadius: 20,
     borderWidth: 2,
     borderColor: "transparent",
@@ -229,11 +249,11 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   dataLabel: {
-    fontSize: width * 0.04,
+    fontSize: 16,
     color: "#a0a0a0",
   },
   dataValue: {
-    fontSize: width * 0.045,
+    fontSize: 18,
     fontWeight: "bold",
     color: "#fff",
   },
