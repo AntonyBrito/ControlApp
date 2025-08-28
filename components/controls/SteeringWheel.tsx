@@ -1,4 +1,4 @@
-import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import {
   GestureHandlerRootView,
@@ -23,9 +23,9 @@ export default function SteeringWheel({
 }: SteeringWheelProps) {
   const rotation = useSharedValue(0);
 
-  // Gesture handler correto
+  // Gesture handler atualizado
   const gestureHandler = useAnimatedGestureHandler({
-    onActive: (event) => {
+    onActive: (event, ctx) => {
       const dx = event.translationX;
       const dy = event.translationY;
 
@@ -50,10 +50,10 @@ export default function SteeringWheel({
   });
 
   return (
-    <GestureHandlerRootView>
+    <GestureHandlerRootView style={styles.container}>
       <PanGestureHandler onGestureEvent={gestureHandler}>
         <Animated.View style={[styles.wheelContainer, animatedStyle]}>
-          <FontAwesome5 name="circle-notch" size={150} color="#61a3f2" />
+          <MaterialCommunityIcons name="steering" size={220} color="#2c5282" />
         </Animated.View>
       </PanGestureHandler>
 
@@ -62,14 +62,27 @@ export default function SteeringWheel({
           style={[styles.pedal, styles.brake]}
           onPressIn={() => onPedalChange("FREANDO")}
           onPressOut={() => onPedalChange("PARADO")}
+          activeOpacity={0.8}
         >
+          <MaterialCommunityIcons
+            name="car-brake-alert"
+            size={42}
+            color="#e53e3e"
+          />
           <Text style={styles.pedalText}>FREIO</Text>
         </TouchableOpacity>
+
         <TouchableOpacity
           style={[styles.pedal, styles.accelerator]}
           onPressIn={() => onPedalChange("ACELERANDO")}
           onPressOut={() => onPedalChange("PARADO")}
+          activeOpacity={0.8}
         >
+          <MaterialCommunityIcons
+            name="rocket-launch-outline"
+            size={42}
+            color="#48bb78"
+          />
           <Text style={styles.pedalText}>ACELERADOR</Text>
         </TouchableOpacity>
       </View>
@@ -78,34 +91,51 @@ export default function SteeringWheel({
 }
 
 const styles = StyleSheet.create({
-  wheelContainer: {
-    width: 200,
-    height: 200,
-    borderRadius: 100,
+  container: {
+    flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#333642",
+    paddingVertical: 20,
+  },
+  wheelContainer: {
+    width: 260,
+    height: 260,
+    borderRadius: 130,
+    justifyContent: "center",
+    alignItems: "center",
     marginBottom: 40,
-    alignSelf: "center",
   },
   pedalsContainer: {
     flexDirection: "row",
     justifyContent: "space-around",
     width: "100%",
+    paddingHorizontal: 30,
+    gap: 40,
   },
   pedal: {
-    paddingVertical: 15,
-    paddingHorizontal: 30,
-    borderRadius: 10,
+    width: 130,
+    height: 110,
+    borderRadius: 16,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#1F2937",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 6,
+    borderWidth: 2,
   },
   brake: {
-    backgroundColor: "#e53e3e",
+    borderColor: "#e53e3e",
   },
   accelerator: {
-    backgroundColor: "#48bb78",
+    borderColor: "#48bb78",
   },
   pedalText: {
     color: "white",
     fontWeight: "bold",
+    marginTop: 10,
+    fontSize: 14,
   },
 });
