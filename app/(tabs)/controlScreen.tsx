@@ -234,11 +234,11 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   dataLabel: {
-    fontSize: 16,
+    fontSize: width * 0.04,
     color: "#a0a0a0",
   },
   dataValue: {
-    fontSize: 18,
+    fontSize: width * 0.045,
     fontWeight: "bold",
     color: "#fff",
   },
