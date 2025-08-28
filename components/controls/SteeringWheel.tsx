@@ -1,5 +1,11 @@
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  Dimensions,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import {
   GestureHandlerRootView,
   PanGestureHandler,
@@ -17,33 +23,43 @@ interface SteeringWheelProps {
   onPedalChange: (status: "ACELERANDO" | "FREANDO" | "PARADO") => void;
 }
 
+const { width } = Dimensions.get("window");
+const wheelContainerSize = width * 0.7;
+const wheelIconSize = wheelContainerSize * 0.9;
+const pedalWidth = width * 0.35;
+const pedalHeight = pedalWidth * 0.85;
+
 export default function SteeringWheel({
   onAngleChange,
   onPedalChange,
 }: SteeringWheelProps) {
   const rotation = useSharedValue(0);
 
-  // Gesture handler atualizado
   const gestureHandler = useAnimatedGestureHandler({
-    onActive: (event, ctx) => {
-      const dx = event.translationX;
-      const dy = event.translationY;
+    onActive: (event) => {
+      const centerX = wheelContainerSize / 2;
+      const centerY = wheelContainerSize / 2;
 
-      let angle = (Math.atan2(dy, dx) * 180) / Math.PI;
+      const dx = event.x - centerX;
+      const dy = event.y - centerY;
 
-      // Limitar o ângulo
-      angle = Math.max(-180, Math.min(180, angle));
+      // Calcula o ângulo e adiciona 90 graus para que o topo seja o grau 0
+      const newAngle = Math.atan2(dy, dx) * (180 / Math.PI) + 90;
 
-      rotation.value = angle;
-      runOnJS(onAngleChange)(Math.round(angle));
+      // Limita o ângulo a um giro de 180 graus para cada lado
+      const clampedAngle = Math.max(-180, Math.min(180, newAngle));
+
+      rotation.value = clampedAngle;
+      runOnJS(onAngleChange)(clampedAngle);
     },
     onEnd: () => {
+      // Retorna suavemente ao centro ao soltar
       rotation.value = withSpring(0);
       runOnJS(onAngleChange)(0);
     },
   });
 
-  const animatedStyle = useAnimatedStyle(() => {
+  const animatedRotationStyle = useAnimatedStyle(() => {
     return {
       transform: [{ rotate: `${rotation.value}deg` }],
     };
@@ -52,8 +68,14 @@ export default function SteeringWheel({
   return (
     <GestureHandlerRootView style={styles.container}>
       <PanGestureHandler onGestureEvent={gestureHandler}>
-        <Animated.View style={[styles.wheelContainer, animatedStyle]}>
-          <MaterialCommunityIcons name="steering" size={220} color="#2c5282" />
+        <Animated.View style={styles.wheelContainer}>
+          <Animated.View style={animatedRotationStyle}>
+            <MaterialCommunityIcons
+              name="steering"
+              size={wheelIconSize}
+              color="#61a3f2"
+            />
+          </Animated.View>
         </Animated.View>
       </PanGestureHandler>
 
@@ -66,7 +88,7 @@ export default function SteeringWheel({
         >
           <MaterialCommunityIcons
             name="car-brake-alert"
-            size={42}
+            size={pedalHeight * 0.4}
             color="#e53e3e"
           />
           <Text style={styles.pedalText}>FREIO</Text>
@@ -80,7 +102,7 @@ export default function SteeringWheel({
         >
           <MaterialCommunityIcons
             name="rocket-launch-outline"
-            size={42}
+            size={pedalHeight * 0.4}
             color="#48bb78"
           />
           <Text style={styles.pedalText}>ACELERADOR</Text>
@@ -95,26 +117,23 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    paddingVertical: 20,
+    width: "100%",
   },
   wheelContainer: {
-    width: 260,
-    height: 260,
-    borderRadius: 130,
+    width: wheelContainerSize,
+    height: wheelContainerSize,
+    borderRadius: wheelContainerSize / 2,
     justifyContent: "center",
     alignItems: "center",
-    marginBottom: 40,
   },
   pedalsContainer: {
     flexDirection: "row",
     justifyContent: "space-around",
     width: "100%",
-    paddingHorizontal: 30,
-    gap: 40,
   },
   pedal: {
-    width: 130,
-    height: 110,
+    width: pedalWidth,
+    height: pedalHeight,
     borderRadius: 16,
     justifyContent: "center",
     alignItems: "center",
@@ -136,6 +155,6 @@ const styles = StyleSheet.create({
     color: "white",
     fontWeight: "bold",
     marginTop: 10,
-    fontSize: 14,
+    fontSize: width * 0.035,
   },
 });

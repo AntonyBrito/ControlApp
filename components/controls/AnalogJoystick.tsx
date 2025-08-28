@@ -1,20 +1,21 @@
 import React from "react";
-import { View, StyleSheet } from "react-native";
+import { Dimensions, StyleSheet, View } from "react-native";
 import {
   GestureHandlerRootView,
   PanGestureHandler,
 } from "react-native-gesture-handler";
 import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  useAnimatedGestureHandler,
-  withSpring,
   runOnJS,
+  useAnimatedGestureHandler,
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
 } from "react-native-reanimated";
 
 // --- Constantes e Tipagens ---
-const JOYSTICK_SIZE = 200;
-const JOYSTICK_KNOB_SIZE = 80;
+const { width } = Dimensions.get("window");
+const JOYSTICK_SIZE = width * 0.6;
+const JOYSTICK_KNOB_SIZE = JOYSTICK_SIZE * 0.4;
 const JOYSTICK_RADIUS = JOYSTICK_SIZE / 2;
 const KNOB_RADIUS = JOYSTICK_KNOB_SIZE / 2;
 const MAX_DISTANCE = JOYSTICK_RADIUS - KNOB_RADIUS;
@@ -48,7 +49,7 @@ export default function AnalogJoystick({ onMove }: JoystickProps) {
       translateY.value = newY;
 
       if (onMove) {
-        runOnJS(onMove)({ x: newX, y: -newY }); // Invertendo Y para o padrão (cima é positivo)
+        runOnJS(onMove)({ x: newX, y: -newY }); 
       }
     },
     onEnd: () => {

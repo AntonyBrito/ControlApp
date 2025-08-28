@@ -1,12 +1,6 @@
-import React from "react";
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  Dimensions,
-} from "react-native";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
+import React from "react";
+import { Dimensions, StyleSheet, TouchableOpacity, View } from "react-native";
 
 type DpadDirection = "FRENTE" | "TRÁS" | "ESQUERDA" | "DIREITA" | "PARADO";
 
@@ -59,6 +53,7 @@ export default function Dpad({ onDirectionChange }: DpadProps) {
 
 const { width } = Dimensions.get("window");
 const containerSize = width * 0.6;
+const buttonSize = containerSize / 3;
 
 const styles = StyleSheet.create({
   dpadContainer: {
@@ -70,8 +65,8 @@ const styles = StyleSheet.create({
   },
   dpadButton: {
     position: "absolute",
-    width: containerSize / 3,
-    height: containerSize / 3,
+    width: buttonSize,
+    height: buttonSize,
     backgroundColor: "#333642",
     justifyContent: "center",
     alignItems: "center",
@@ -79,14 +74,18 @@ const styles = StyleSheet.create({
   },
   up: {
     top: 0,
+    left: buttonSize,
   },
   down: {
     bottom: 0,
+    left: buttonSize,
   },
   left: {
     left: 0,
+    top: buttonSize,
   },
   right: {
     right: 0,
+    top: buttonSize,
   },
 });

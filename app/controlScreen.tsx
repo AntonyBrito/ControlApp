@@ -10,7 +10,6 @@ import {
   View,
 } from "react-native";
 
-// Define o tipo para os controlos disponíveis
 type JoystickType = "analogico" | "setas" | "volante";
 
 export default function ControlScreen() {
@@ -162,16 +161,12 @@ export default function ControlScreen() {
         </TouchableOpacity>
       </View>
 
-      <Text style={styles.title}>Painel de Controlo</Text>
-
       <View style={styles.joystickContainer}>{renderControl()}</View>
       <View style={styles.dataBox}>{renderDataBox()}</View>
-      {/* O modal de configurações foi removido */}
     </View>
   );
 }
 
-// Estilos responsivos
 const { width, height } = Dimensions.get("window");
 
 const styles = StyleSheet.create({
@@ -180,7 +175,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "#0A192F",
-    paddingTop: height * 0.05,
+    paddingTop: height * 0.1,
     gap: 20,
   },
   controlButtonsContainer: {
@@ -188,7 +183,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-around",
     width: "80%",
     position: "absolute",
-    top: height * 0.05,
+    top: height * 0.1,
     zIndex: 1,
   },
   controlButton: {
