@@ -3,8 +3,8 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useFocusEffect, useRouter } from "expo-router";
 import React, { useEffect, useRef } from "react";
 import { Animated, Pressable, Text } from "react-native";
-import styles from "../../assets/Styles/index";
-import AnimatedScreen from "../../components/animation/AnimatedScreen";
+import styles from "../assets/Styles/index";
+import AnimatedScreen from "../components/animation/AnimatedScreen";
 
 export default function InitialScreen() {
   const router = useRouter();
